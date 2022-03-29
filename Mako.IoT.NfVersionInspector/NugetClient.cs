@@ -9,6 +9,7 @@ namespace Mako.IoT.NFVersionInspector
         {
             versionFound = null;
             using var client = new HttpClient();
+            // Console.WriteLine($"Getting {id} {version}");
             var response = client.GetAsync($"https://api.nuget.org/v3-flatcontainer/{id}/{version}/{id}.nuspec").GetAwaiter().GetResult();
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -17,13 +18,16 @@ namespace Mako.IoT.NFVersionInspector
                 if (versionFound != null)
                 {
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine($"Package {id} {version} not found on nuget. Getting closest version: {versionFound}");
+                    // Console.WriteLine($"Package {id} {version} not found on nuget. Getting closest version: {versionFound}");
                     Console.ForegroundColor = ConsoleColor.White;
                     response = client
                         .GetAsync($"https://api.nuget.org/v3-flatcontainer/{id}/{versionFound}/{id}.nuspec")
                         .GetAwaiter().GetResult();
                 }
             }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                throw new PackageNotFoundException();
 
             response.EnsureSuccessStatusCode();
             using var r = new StreamReader(response.Content.ReadAsStream());
@@ -41,5 +45,9 @@ namespace Mako.IoT.NFVersionInspector
             list.Reverse();
             return list;
         }
+    }
+
+    public class PackageNotFoundException : Exception
+    {
     }
 }

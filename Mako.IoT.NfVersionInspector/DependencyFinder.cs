@@ -43,6 +43,10 @@
                 packages.Add(package);
                 foreach (var p in package.Dependencies)
                 {
+                    if (!MinimumVersions.IsMinimumVersion(p))
+                        throw new PackageNotFoundException();
+
+
                     if (!packages.Contains(p))
                     {
                         if (p.IsNative)
@@ -56,19 +60,29 @@
             return packages;
         }
 
-        public static string? FindCompatibleVersion(string id, IEnumerable<Package> nativePackages, bool refreshCache = false)
+        public static string? FindCompatibleVersion(string id, IEnumerable<Package> nativePackages,
+            bool refreshCache = false, bool silent = false)
+
         {
             var versions = NugetClient.GetPackageVersions(id);
             var np = nativePackages as Package[] ?? nativePackages.ToArray();
 
             foreach (var version in versions)
             {
-                Console.WriteLine($"Checking {id} {version}...");
+                if (!silent)
+                    Console.WriteLine($"Checking {id} {version}...");
 
-                var deps = GetDependenciesFromNuget(id, version, refreshCache).Where(d => d.IsNative);
+                try
+                {
+                    var deps = GetDependenciesFromNuget(id, version, refreshCache).Where(d => d.IsNative);
 
-                if (!deps.Except(np).Any())
-                    return version;
+                    if (!deps.Except(np).Any())
+                        return version;
+
+                }
+                catch (PackageNotFoundException)
+                {
+                }
 
             }
 
