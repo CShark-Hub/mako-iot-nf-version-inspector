@@ -1,5 +1,6 @@
 using System.IO;
 using Mako.IoT.NFVersionInspector;
+using Mako.IoT.NFVersionInspector.Services;
 using Xunit;
 
 namespace Mako.IoT.NfVersionInspector.Test
@@ -38,7 +39,7 @@ This package requires a target with nanoFramework.Windows.Storage v100.0.2.0 (ch
   </metadata>
 </package>");
 
-            var result = NuspecParser.Parse(ns);
+            var result = new NuspecParser().Parse(ns);
 
             Assert.Equal("nanoFramework.Windows.Storage", result.Id);
             Assert.Equal("1.4.5-preview.30", result.Version);

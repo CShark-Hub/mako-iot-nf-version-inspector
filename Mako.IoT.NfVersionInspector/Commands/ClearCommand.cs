@@ -1,14 +1,23 @@
-﻿namespace Mako.IoT.NFVersionInspector.Commands
+﻿using Mako.IoT.NFVersionInspector.Services;
+
+namespace Mako.IoT.NFVersionInspector.Commands
 {
     public class ClearCommand
     {
-        public static int Execute(ClearOptions options)
+        private readonly IStorage _storage;
+
+        public ClearCommand(IStorage storage)
+        {
+            _storage = storage;
+        }
+
+        public int Execute(ClearOptions options)
         {
             if (options.ClearBoards)
-                Storage.ClearBoardsInfo();
+                _storage.ClearBoardsInfo();
 
             if (options.ClearPackages)
-                Storage.ClearPackages();
+                _storage.ClearPackages();
 
             return 0;
         }

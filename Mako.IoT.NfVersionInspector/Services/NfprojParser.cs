@@ -2,13 +2,13 @@
 using System.Xml;
 using Mako.IoT.NFVersionInspector.Extensions;
 
-namespace Mako.IoT.NFVersionInspector
+namespace Mako.IoT.NFVersionInspector.Services
 {
-    public class NfprojParser
+    public class NfprojParser : INfprojParser
     {
         private static readonly Regex PathRegex = new Regex(@"^(.*\\)*packages\\([\w\.-]+)\\", RegexOptions.Compiled);
 
-        public static IEnumerable<string> GetPackagesPaths(TextReader reader)
+        public IEnumerable<string> GetPackagesPaths(TextReader reader)
         {
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(reader);

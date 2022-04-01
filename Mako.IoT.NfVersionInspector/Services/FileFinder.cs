@@ -1,17 +1,21 @@
 ﻿using System.IO.Compression;
 
-namespace Mako.IoT.NFVersionInspector
+namespace Mako.IoT.NFVersionInspector.Services
 {
-    public class FileFinder
+    public class FileFinder : IFileFinder
     {
-        public static IEnumerable<string> FindNfprojFiles(string rootPath)
+        public void ProcessNfprojFiles(string rootPath, Action<StreamReader> processAction)
         {
-            return Directory.GetFiles(rootPath, "*.nfproj", SearchOption.AllDirectories);
+            foreach (var file in Directory.GetFiles(rootPath, "*.nfproj", SearchOption.AllDirectories))
+            {
+                using var reader = new StreamReader(File.OpenRead(file));
+                processAction(reader);
+                reader.Close();
+            }
         }
 
-        public static IEnumerable<Package> FindNuspecFiles(string rootPath, IEnumerable<string> packages)
+        public void ProcessNuspecFiles(string rootPath, IEnumerable<string> packages, Action<StreamReader> processAction)
         {
-            var files = new List<Package>();
             var packagesFolder = Directory.GetDirectories(rootPath, "packages", SearchOption.AllDirectories).First();
             foreach (var p in packages)
             {
@@ -24,18 +28,16 @@ namespace Mako.IoT.NFVersionInspector
                     if (nupkg != null)
                     {
                         using var zip = ZipFile.OpenRead(nupkg);
-                        var nuspecEntry = zip.Entries.Where(e => e.Name.EndsWith(".nuspec")).FirstOrDefault();
+                        var nuspecEntry = zip.Entries.FirstOrDefault(e => e.Name.EndsWith(".nuspec"));
                         if (nuspecEntry != null)
                         {
                             using var reader = new StreamReader(nuspecEntry.Open());
-
-                            files.Add(NuspecParser.Parse(reader));
+                            processAction(reader);
+                            reader.Close();
                         }
                     }
                 }
             }
-
-            return files;
         }
     }
 }

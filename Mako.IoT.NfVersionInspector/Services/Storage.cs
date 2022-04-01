@@ -1,36 +1,36 @@
 ﻿using Newtonsoft.Json;
 
-namespace Mako.IoT.NFVersionInspector
+namespace Mako.IoT.NFVersionInspector.Services
 {
-    public class Storage
+    public class Storage : IStorage
     {
-        public static IEnumerable<Package> Load(string id)
+        public IEnumerable<Package> Load(string id)
         {
             return LoadFromFile(GetFilePath($"{id}.nugetcache")) ?? Array.Empty<Package>();
         }
 
-        public static void Save(string id, IEnumerable<Package> packages)
+        public void Save(string id, IEnumerable<Package> packages)
         {
             SaveToFile(GetFilePath($"{id}.nugetcache"), packages);
         }
 
-        public static void SaveBoardInfo(string name, IEnumerable<Package> packages)
+        public void SaveBoardInfo(string name, IEnumerable<Package> packages)
         {
             SaveToFile(GetFilePath($"{name}.boardcache"), packages);
         }
 
-        public static IEnumerable<Package> LoadBoardInfo(string name)
+        public IEnumerable<Package> LoadBoardInfo(string name)
         {
             return LoadFromFile(GetFilePath($"{name}.boardcache")) ?? throw new FileNotFoundException();
         }
 
-        public static IEnumerable<string> ListBoardInfo()
+        public IEnumerable<string> ListBoardInfo()
         {
             return Directory.GetFiles(GetFilePath(String.Empty), "*.boardcache")
                 .Select(Path.GetFileNameWithoutExtension)!;
         }
 
-        public static IEnumerable<Package>? LoadFromFile(string fileName)
+        public IEnumerable<Package>? LoadFromFile(string fileName)
         {
             if (!File.Exists(fileName))
                 return null;
@@ -50,7 +50,7 @@ namespace Mako.IoT.NFVersionInspector
             return null;
         }
 
-        private static void SaveToFile(string fileName, IEnumerable<Package> packages)
+        private void SaveToFile(string fileName, IEnumerable<Package> packages)
         {
             var s = JsonConvert.SerializeObject(packages);
             if (File.Exists(fileName))
@@ -60,7 +60,7 @@ namespace Mako.IoT.NFVersionInspector
             sw.Close();
         }
 
-        private static string GetFilePath(string fileName)
+        private string GetFilePath(string fileName)
         {
             var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 "Mako.IoT.NFVersionInspector");
@@ -70,7 +70,7 @@ namespace Mako.IoT.NFVersionInspector
             return fileName == String.Empty ? folder : Path.Combine(folder, fileName);
         }
 
-        public static void ClearBoardsInfo()
+        public void ClearBoardsInfo()
         {
             foreach (var file in Directory.GetFiles(GetFilePath(String.Empty), "*.boardcache"))
             {
@@ -78,7 +78,7 @@ namespace Mako.IoT.NFVersionInspector
             }
         }
 
-        public static void ClearPackages()
+        public void ClearPackages()
         {
             foreach (var file in Directory.GetFiles(GetFilePath(String.Empty), "*.nugetcache"))
             {

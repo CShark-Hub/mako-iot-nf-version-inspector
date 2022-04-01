@@ -1,17 +1,24 @@
 ﻿using System.Collections.Concurrent;
 
-namespace Mako.IoT.NFVersionInspector
+namespace Mako.IoT.NFVersionInspector.Services
 {
-    public class Cache
+    public class Cache : ICache
     {
+        private readonly IStorage _storage;
+
         private static readonly IDictionary<string, HashSet<Package>> Packages =
             new ConcurrentDictionary<string, HashSet<Package>>();
 
-        public static Package GetOrAdd(string id, string version, Func<string, string, Package> getFunc, bool forceRefresh = false)
+        public Cache(IStorage storage)
+        {
+            _storage = storage;
+        }
+
+        public Package GetOrAdd(string id, string version, Func<string, string, Package> getFunc, bool forceRefresh = false)
         {
             if (!Packages.ContainsKey(id))
             {
-                Packages.Add(id, new HashSet<Package>(Storage.Load(id)));
+                Packages.Add(id, new HashSet<Package>(_storage.Load(id)));
             }
 
             if (forceRefresh)
@@ -24,7 +31,7 @@ namespace Mako.IoT.NFVersionInspector
                 package = getFunc(id, version);
                 Packages[id].Add(package);
 
-                Storage.Save(id, Packages[id]);
+                _storage.Save(id, Packages[id]);
             }
 
             return package;

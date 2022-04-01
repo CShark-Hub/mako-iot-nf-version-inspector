@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using Mako.IoT.NFVersionInspector;
+using Mako.IoT.NFVersionInspector.Services;
 using Xunit;
 
 namespace Mako.IoT.NfVersionInspector.Test
@@ -85,7 +86,7 @@ namespace Mako.IoT.NfVersionInspector.Test
   </ProjectExtensions>
 </Project>");
 
-            var result = NfprojParser.GetPackagesPaths(r);
+            var result = new NfprojParser().GetPackagesPaths(r);
             Assert.Equal(11, result.Count());
             Assert.Contains(result, s => s == "nanoFramework.Windows.Devices.Wifi.1.3.4-preview.30");
 

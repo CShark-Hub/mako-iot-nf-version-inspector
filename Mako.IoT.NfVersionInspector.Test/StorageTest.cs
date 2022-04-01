@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mako.IoT.NFVersionInspector;
+using Mako.IoT.NFVersionInspector.Services;
 using Xunit;
 
 namespace Mako.IoT.NfVersionInspector.Test
@@ -26,13 +27,13 @@ namespace Mako.IoT.NfVersionInspector.Test
                 new Package("id.1", "version.8"),
             });
 
-            Storage.Save("id.1", p);
+            new Storage().Save("id.1", p);
         }
 
         [Fact]
         public void Load()
         {
-            var p = Storage.Load("id.1");
+            var p = new Storage().Load("id.1");
             Assert.Equal(8, p.Count());
         }
     }

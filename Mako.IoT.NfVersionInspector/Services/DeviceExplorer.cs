@@ -2,11 +2,11 @@
 using nanoFramework.Tools.Debugger.PortSerial;
 using nanoFramework.Tools.Debugger.WireProtocol;
 
-namespace Mako.IoT.NFVersionInspector
+namespace Mako.IoT.NFVersionInspector.Services
 {
-    public class DeviceExplorer
+    public class DeviceExplorer : IDeviceExplorer
     {
-        public static INanoFrameworkDeviceInfo GetBoardInfo(string portName)
+        public INanoFrameworkDeviceInfo GetBoardInfo(string portName)
         {
             var port = PortBase.CreateInstanceForSerial(false, null);
             var device = new NanoDevice<NanoSerialDevice>();

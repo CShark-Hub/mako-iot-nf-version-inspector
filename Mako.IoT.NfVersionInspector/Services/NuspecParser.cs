@@ -2,13 +2,13 @@
 using System.Xml;
 using Mako.IoT.NFVersionInspector.Extensions;
 
-namespace Mako.IoT.NFVersionInspector
+namespace Mako.IoT.NFVersionInspector.Services
 {
-    public class NuspecParser
+    public class NuspecParser : INuspecParser
     {
         private static readonly Regex DescRegex =
             new Regex(@"([\w\.]+)\sv([\d\.]+)\s\(checksum\s([\dA-Fx]+)\)", RegexOptions.Compiled);
-        public static Package Parse(TextReader reader)
+        public Package Parse(TextReader reader)
         {
             var xmlDoc = new XmlDocument();
             xmlDoc.Load(reader);
@@ -26,13 +26,13 @@ namespace Mako.IoT.NFVersionInspector
             return package;
         }
 
-        private static Package? ParseDescription(string description)
+        private Package? ParseDescription(string description)
         {
             var m = DescRegex.Match(description);
             return m.Success ? new Package(m.Groups[1].Value, m.Groups[2].Value, m.Groups[3].Value) : null;
         }
 
-        private static IList<Package> ParseDependencies(XmlNode? node, XmlNamespaceManager nsmgr)
+        private IList<Package> ParseDependencies(XmlNode? node, XmlNamespaceManager nsmgr)
         {
             return node?.GetNodes("n:dependency", nsmgr).Select(n =>
                        new Package(n.GetAttribute("id").Value, n.GetAttribute("version").Value)).ToList()

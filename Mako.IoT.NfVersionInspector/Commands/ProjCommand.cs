@@ -1,12 +1,24 @@
 ﻿using Mako.IoT.NFVersionInspector.Extensions;
+using Mako.IoT.NFVersionInspector.Services;
 
 namespace Mako.IoT.NFVersionInspector.Commands
 {
     public class ProjCommand
     {
-        public static int Execute(ProjOptions options)
+        private readonly IStorage _storage;
+        private readonly IDependencyFinder _dependencyFinder;
+        private readonly IDeviceExplorer _deviceExplorer;
+
+        public ProjCommand(IStorage storage, IDependencyFinder dependencyFinder, IDeviceExplorer deviceExplorer)
         {
-            var existingPackages = DependencyFinder.FindPackages(options.Path).Flatten().ToArray();
+            _storage = storage;
+            _dependencyFinder = dependencyFinder;
+            _deviceExplorer = deviceExplorer;
+        }
+
+        public int Execute(ProjOptions options)
+        {
+            var existingPackages = _dependencyFinder.FindPackages(options.Path).Flatten().ToArray();
             Console.WriteLine();
             Console.WriteLine("Assemblies referenced in the solution:");
             OutputPackages(existingPackages);
@@ -20,19 +32,19 @@ namespace Mako.IoT.NFVersionInspector.Commands
 
                 if (!String.IsNullOrWhiteSpace(options.BoardName))
                 {
-                    nativePackages = Storage.LoadBoardInfo(options.BoardName).ToArray();
+                    nativePackages = _storage.LoadBoardInfo(options.BoardName).ToArray();
                 }
                 else
                 {
                     if (String.IsNullOrWhiteSpace(options.Port))
                         throw new ArgumentNullException(nameof(options.Port));
-                    nativePackages = DeviceExplorer.GetBoardInfo(options.Port).NativePackages().ToArray();
+                    nativePackages = _deviceExplorer.GetBoardInfo(options.Port).NativePackages().ToArray();
                 }
 
                 foreach (var projectPackage in existingPackages.Where(p=>!p.IsNative))
                 {
                     Console.Write($"Checking {projectPackage.Id} {projectPackage.Version} - ");
-                    if (!DependencyFinder.GetDependenciesFromNuget(projectPackage.Id, projectPackage.Version).Flatten()
+                    if (!_dependencyFinder.GetDependenciesFromNuget(projectPackage.Id, projectPackage.Version).Flatten()
                         .Where(p=>p.IsNative)
                         .Except(nativePackages)
                         .Any())
@@ -44,7 +56,7 @@ namespace Mako.IoT.NFVersionInspector.Commands
                         if (options.UpgradeCheck)
                         {
                             var compatibleVersion =
-                                DependencyFinder.FindCompatibleVersion(projectPackage.Id, nativePackages, false, true);
+                                _dependencyFinder.FindCompatibleVersion(projectPackage.Id, nativePackages, false, true);
 
                             if (compatibleVersion != null && compatibleVersion != projectPackage.Version)
                             {
@@ -63,7 +75,7 @@ namespace Mako.IoT.NFVersionInspector.Commands
                         Console.ForegroundColor = ConsoleColor.White;
 
                         var compatibleVersion =
-                            DependencyFinder.FindCompatibleVersion(projectPackage.Id, nativePackages, false, true);
+                            _dependencyFinder.FindCompatibleVersion(projectPackage.Id, nativePackages, false, true);
 
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine(compatibleVersion == null

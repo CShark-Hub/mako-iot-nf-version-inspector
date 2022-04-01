@@ -1,4 +1,4 @@
-﻿namespace Mako.IoT.NFVersionInspector
+﻿namespace Mako.IoT.NFVersionInspector.Services
 {
     public class MinimumVersions
     {
