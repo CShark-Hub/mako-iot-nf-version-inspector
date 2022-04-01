@@ -24,6 +24,12 @@ namespace Mako.IoT.NFVersionInspector
             return LoadFromFile(GetFilePath($"{name}.boardcache")) ?? throw new FileNotFoundException();
         }
 
+        public static IEnumerable<string> ListBoardInfo()
+        {
+            return Directory.GetFiles(GetFilePath(String.Empty), "*.boardcache")
+                .Select(Path.GetFileNameWithoutExtension)!;
+        }
+
         public static IEnumerable<Package>? LoadFromFile(string fileName)
         {
             if (!File.Exists(fileName))

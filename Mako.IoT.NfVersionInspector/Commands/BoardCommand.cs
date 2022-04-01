@@ -6,15 +6,26 @@ namespace Mako.IoT.NFVersionInspector.Commands
     {
         public static int Execute(BoardOptions options)
         {
-            var info = DeviceExplorer.GetBoardInfo(options.Port);
-
-            Console.WriteLine(info);
-
-            if (!String.IsNullOrWhiteSpace(options.Name))
+            if (options.List)
             {
-                var packages = info.NativePackages();
+                foreach (var boardName in Storage.ListBoardInfo())
+                {
+                    Console.WriteLine(boardName);
+                }
+            }
 
-                Storage.SaveBoardInfo(options.Name, packages);
+            if (!String.IsNullOrWhiteSpace(options.Port))
+            {
+                var info = DeviceExplorer.GetBoardInfo(options.Port);
+
+                Console.WriteLine(info);
+
+                if (!String.IsNullOrWhiteSpace(options.Name))
+                {
+                    var packages = info.NativePackages();
+
+                    Storage.SaveBoardInfo(options.Name, packages);
+                }
             }
 
             return 0;
