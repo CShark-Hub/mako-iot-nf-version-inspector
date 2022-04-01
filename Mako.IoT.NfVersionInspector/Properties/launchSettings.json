@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "nf-version-manager": {
-      "commandName": "Project",
-      "commandLineArgs": "find -n esp32 -i nanoFramework.M2Mqtt"
-    }
-  }
-}
