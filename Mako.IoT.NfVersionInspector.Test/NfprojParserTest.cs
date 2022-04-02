@@ -9,9 +9,10 @@ namespace Mako.IoT.NfVersionInspector.Test
     public class NfprojParserTest
     {
         [Fact]
-        public void GetPackagesPaths()
+        public void GetPackagesPaths_given_nfproj_should_extract_packages_paths()
         {
-            var r = new StringReader(@"<?xml version=""1.0"" encoding=""utf-8""?>
+            var r = new StringReader(
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""Current"" DefaultTargets=""Build"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
   <PropertyGroup Label=""Globals"">
     <NanoFrameworkProjectSystemPath>$(MSBuildExtensionsPath)\nanoFramework\v1.0\</NanoFrameworkProjectSystemPath>
@@ -84,11 +85,14 @@ namespace Mako.IoT.NfVersionInspector.Test
       <ProjectConfigurationsDeclaredAsItems />
     </ProjectCapabilities>
   </ProjectExtensions>
-</Project>");
+</Project>"
+                );
 
-            var result = new NfprojParser().GetPackagesPaths(r);
+            var result = new NfprojParser().GetPackagesPaths(r).ToArray();
             Assert.Equal(11, result.Count());
-            Assert.Contains(result, s => s == "nanoFramework.Windows.Devices.Wifi.1.3.4-preview.30");
+            Assert.Contains("nanoFramework.CoreLibrary.1.11.7", result);
+            Assert.Contains("nanoFramework.Windows.Devices.Wifi.1.3.4-preview.30", result);
+            Assert.Contains("nanoFramework.Windows.Storage.Streams.1.12.3", result);
 
         }
     }

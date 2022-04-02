@@ -4,6 +4,17 @@ namespace Mako.IoT.NFVersionInspector.Services
 {
     public class Storage : IStorage
     {
+        public const string Folder = "Mako.IoT.NFVersionInspector";
+        public const string NugetCacheExt = ".nugetcache";
+        public const string BoardCacheExt = ".boardcache";
+
+        private readonly Settings _settings;
+
+        public Storage(Settings settings)
+        {
+            _settings = settings;
+        }
+
         public IEnumerable<Package> Load(string id)
         {
             return LoadFromFile(GetFilePath($"{id}.nugetcache")) ?? Array.Empty<Package>();
@@ -62,8 +73,7 @@ namespace Mako.IoT.NFVersionInspector.Services
 
         private string GetFilePath(string fileName)
         {
-            var folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                "Mako.IoT.NFVersionInspector");
+            var folder = Path.Combine(_settings.DataFolder, Folder);
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
 

@@ -8,9 +8,10 @@ namespace Mako.IoT.NfVersionInspector.Test
     public class NuspecParserTest
     {
         [Fact]
-        public void ParseNuspec()
+        public void ParseNuspec_given_nuspec_string_should_return_package()
         {
-            var ns = new StringReader(@"<?xml version=""1.0"" encoding=""utf-8""?>
+            var ns = new StringReader(
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
 <package xmlns=""http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd"">
   <metadata>
     <id>nanoFramework.Windows.Storage</id>
@@ -37,7 +38,8 @@ This package requires a target with nanoFramework.Windows.Storage v100.0.2.0 (ch
       <dependency id=""nanoFramework.System.Text"" version=""1.1.2"" />
     </dependencies>
   </metadata>
-</package>");
+</package>"
+                );
 
             var result = new NuspecParser().Parse(ns);
 

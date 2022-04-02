@@ -1,4 +1,5 @@
 ﻿using CommandLine;
+using Mako.IoT.NFVersionInspector;
 using Mako.IoT.NFVersionInspector.Commands;
 using Mako.IoT.NFVersionInspector.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -20,6 +21,11 @@ var sp = new ServiceCollection()
     .AddSingleton<INugetClient, NugetClient>()
     .AddSingleton<INuspecParser, NuspecParser>()
     .AddSingleton<IStorage, Storage>()
+    //settings
+    .AddSingleton(new Settings
+    {
+        DataFolder = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)
+    })
     .BuildServiceProvider();
 
 Parser.Default.ParseArguments<BoardOptions, ProjOptions, CheckOptions, FindOptions, ClearOptions>(args)

@@ -16,16 +16,12 @@ namespace Mako.IoT.NFVersionInspector.Services
         {
             versionFound = version;
             using var client = new HttpClient();
-            // Console.WriteLine($"Getting {id} {version}");
             var response = client.GetAsync($"https://api.nuget.org/v3-flatcontainer/{id}/{version}/{id}.nuspec").GetAwaiter().GetResult();
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
                 var versions = GetPackageVersions(id);
                 versionFound = versions.FirstOrDefault(v => v.StartsWith(version)) ??
                                throw new PackageNotFoundException($"Package {id} not found on nuget");
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                // Console.WriteLine($"Package {id} {version} not found on nuget. Getting closest version: {versionFound}");
-                Console.ForegroundColor = ConsoleColor.White;
                 response = client
                     .GetAsync($"https://api.nuget.org/v3-flatcontainer/{id}/{versionFound}/{id}.nuspec")
                     .GetAwaiter().GetResult();
